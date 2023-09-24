@@ -95,6 +95,8 @@ Include the following in the `vLaunch` function. This will create the instance o
     xTaskCreate(led_task, "TestLedThread", configMINIMAL_STACK_SIZE, NULL, 5, &ledtask);
 ```
 
+Build and download the project to the RPi Pico. You should now see the ping message appearing on the serial monitor **AND** the LED blinking as intended.
+
 **Create a Temperature Sensor Task**
 
 The RP2040 microcontroller, embedded in the Raspberry Pi Pico, comes with an inbuilt temperature sensor, allowing developers to easily access and measure the ambient temperature. This sensor is part of the RP2040’s ADC (Analog to Digital Converter) system, which means it converts the analog temperature value to a digital representation that can be processed and read by the MCU. In this section, we’ll discuss how to access this built-in temperature sensor to retrieve temperature data. To access the temperature sensor data, we use the ADC to read the analog voltage and then convert this analog value to a temperature reading in degrees Celsius. Here is a simple step-by-step guide to achieving this.
@@ -132,14 +134,13 @@ void temp_task(__unused void *params) {
 }
 ```
 
-Include the following in the `vLaunch` function.
+Include the following in the `vLaunch` function. This will create the instance of the task for execution. 
 ```
     TaskHandle_t temptask;
     xTaskCreate(temp_task, "TestTempThread", configMINIMAL_STACK_SIZE, NULL, 8, &temptask);
 ```
 
-
-
+Build and download the project to the RPi Pico. You should continue seeing the ping message appearing on the serial monitor and the LED blinking. However, this time, you should also see an additional message appearing on the serial monitor which is the temperature data.
 
 **Create an Average Filtering Task**
 
@@ -171,6 +172,55 @@ void temp_task(__unused void *params) {
     }
 }
 ```
+
+The `avg_task` function is a FreeRTOS task designed to calculate the moving average of temperature data. It operates in an infinite loop, continuously receiving temperature data through a message buffer, `xControlMessageBuffer`. The task maintains a static buffer, `data`, to hold the most recent four elements, and uses a variable, `sum`, to maintain the sum of the elements in this buffer. As new data points are received, the task subtracts the oldest element from `sum`, replaces it with the new data point, and then adds the new data point to `sum`. The index is then updated in a circular manner to ensure that it always points to a valid position within the buffer. If the buffer has not been filled, the count is incremented until it reaches the buffer's size. Finally, the task calculates and prints the average temperature by dividing the sum by the count of received elements.
+```
+void avg_task(__unused void *params) {
+    float fReceivedData;
+    size_t xReceivedBytes;
+    static float data[4] = {0};
+    static int index = 0;
+    static int count = 0;
+    float sum = 0;
+
+    while(true) {
+        xReceivedBytes = xMessageBufferReceive( /* The message buffer to receive from. */
+            xControlMessageBuffer,
+            /* Location to store received data. */
+            (void *) &fReceivedData,
+            /* Maximum number of bytes to receive. */
+            sizeof( fReceivedData ),
+            /* Ticks to wait if buffer is empty. */
+            portMAX_DELAY );
+
+            // Subtract the oldest element from sum
+            sum -= data[index];
+            
+            // Assign the new element to the buffer
+            data[index] = fReceivedData;
+            
+            // Add the new element to sum
+            sum += data[index];
+            
+            // Update the index
+            index = (index + 1) % 4; // make it circular
+            
+            // Increment count till it reaches FILTER_SIZE
+            if (count < 4) count++;
+
+            printf("Average Temperature = %0.2f C\n", sum / count);
+    }
+}
+```
+
+
+Include the following in the `vLaunch` function. This will create the instance of the task for execution. 
+```
+    TaskHandle_t avgtask;
+    xTaskCreate(avg_task, "TestAvgThread", configMINIMAL_STACK_SIZE, NULL, 9, &avgtask);
+```
+
+Build and download the project to the RPi Pico. You should continue seeing the ping message appearing on the serial monitor and the LED blinking. However, this time, you should also see an additional message appearing on the serial monitor which is the temperature data.
 
 ## **EXERCISE**
 
