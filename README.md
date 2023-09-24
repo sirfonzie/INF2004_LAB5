@@ -45,7 +45,10 @@ Do remember to re-select the "Pico ARM GCC" compiler to kick-start the configura
 
 <img src="/img/NoSMP.PNG" width=100% height=100%>
 
-Finally, before you can start compiling your code, make the following changes (lines #107 & #110) to the FreeRTOS configuration. The configuration file is located at "pico_w\wifi\freertos\ping\FreeRTOSConfig.h". 
+Finally, before you can start compiling your code, make the following changes (lines #107 & #110) to the FreeRTOS configuration. The configuration file is located at "pico_w\wifi\freertos\ping\FreeRTOSConfig.h". This disables the SMP and ensures that there will only be a single core used in this example.
+
+> [NOTE]
+> Symmetric Multiprocessing (SMP) support in the FreeRTOS Kernel enables one instance of the FreeRTOS kernel to schedule tasks across multiple identical processor cores. The core architectures must be identical and share the same memory.
 
 ```
 #if FREE_RTOS_KERNEL_SMP // set by the RP2040 SMP port of FreeRTOS
