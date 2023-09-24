@@ -149,7 +149,7 @@ Create the following variable to manage the message buffer. This is to send data
 static MessageBufferHandle_t xControlMessageBuffer;
 ```
 
-Modify the temp_task to send a message each time it obtains new temperature data from the sensor.
+Modify the temp_task to send a message each time it obtains new temperature data from the sensor. In the `temp_task` function, a message buffer, `xControlMessageBuffer`, is used as a mechanism for inter-task communication to send temperature data between tasks. The task initializes and configures the ADC to read the onboard temperature sensor and then enters into an infinite loop. In each iteration of the loop, after a delay, the task reads the onboard temperature and prints it. Subsequently, the temperature data is sent to the message buffer using `xMessageBufferSend()`. This function takes the message buffer to write to, a pointer to the source of the data to send, the length of the data to send, and the block time as parameters. In this case, the source of the data is the address of the `temperature` variable, the length of the data is the size of a `float`, and the block time is set to `0`, meaning the task does not block if the message buffer is full. The data sent to the message buffer can be received by another task using the `xMessageBufferReceive()` function, allowing seamless sharing of data between different tasks in the FreeRTOS environment.
 ```
 void temp_task(__unused void *params) {
     float temperature = 0.0;
@@ -184,14 +184,14 @@ void avg_task(__unused void *params) {
     float sum = 0;
 
     while(true) {
-        xReceivedBytes = xMessageBufferReceive( /* The message buffer to receive from. */
-            xControlMessageBuffer,        /* Location to store received data. */
-            (void *) &fReceivedData,      /* Maximum number of bytes to receive. */
-            sizeof( fReceivedData ),      /* Ticks to wait if buffer is empty. */
+        xReceivedBytes = xMessageBufferReceive( 
+            xControlMessageBuffer,        /* The message buffer to receive from. */
+            (void *) &fReceivedData,      /* Location to store received data. */
+            sizeof( fReceivedData ),      /* Maximum number of bytes to receive. */
             portMAX_DELAY );              /* Wait indefinitely */
 
             sum -= data[index];            // Subtract the oldest element from sum
-            data[index] = fReceivedData;   // Assign the new element to the buffer
+            data[index] = fReceivedData;   // Assign the new element to the data
             sum += data[index];            // Add the new element to sum
             index = (index + 1) % 4;       // Update the index- make it circular
 
