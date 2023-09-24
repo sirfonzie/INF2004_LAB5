@@ -185,28 +185,17 @@ void avg_task(__unused void *params) {
 
     while(true) {
         xReceivedBytes = xMessageBufferReceive( /* The message buffer to receive from. */
-            xControlMessageBuffer,
-            /* Location to store received data. */
-            (void *) &fReceivedData,
-            /* Maximum number of bytes to receive. */
-            sizeof( fReceivedData ),
-            /* Ticks to wait if buffer is empty. */
-            portMAX_DELAY );
+            xControlMessageBuffer,        /* Location to store received data. */
+            (void *) &fReceivedData,      /* Maximum number of bytes to receive. */
+            sizeof( fReceivedData ),      /* Ticks to wait if buffer is empty. */
+            portMAX_DELAY );              /* Wait indefinitely */
 
-            // Subtract the oldest element from sum
-            sum -= data[index];
-            
-            // Assign the new element to the buffer
-            data[index] = fReceivedData;
-            
-            // Add the new element to sum
-            sum += data[index];
-            
-            // Update the index
-            index = (index + 1) % 4; // make it circular
-            
-            // Increment count till it reaches FILTER_SIZE
-            if (count < 4) count++;
+            sum -= data[index];            // Subtract the oldest element from sum
+            data[index] = fReceivedData;   // Assign the new element to the buffer
+            sum += data[index];            // Add the new element to sum
+            index = (index + 1) % 4;       // Update the index- make it circular
+
+            if (count < 4) count++;        // Increment count till it reaches 4
 
             printf("Average Temperature = %0.2f C\n", sum / count);
     }
