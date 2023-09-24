@@ -41,6 +41,8 @@ Do remember to re-select the "Pico ARM GCC" compiler to kick-start the configura
 At this point, if everything is done correctly, you should be able to see the project under CMake.
 <img src="/img/CMakePing.png" width=100% height=100%>
 
+You should try building the project and downloading the code to the RPi Pico. You should be able to see some output on the Serial Monitor.
+
 ## **Create FreeRTOS Tasks**
 
 **Create a Blinking LED Task**
