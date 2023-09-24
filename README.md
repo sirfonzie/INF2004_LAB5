@@ -47,6 +47,14 @@ Reselect the "Pico ARM GCC" compiler to kick-start the configuration process.
 ## **Create FreeRTOS Tasks**
 
 **Create a Blinking LED Task**
+
+Include the following header files to allow printf and to use the GPIO for the LED.
+```
+#include <stdio.h>
+#include "hardware/gpio.h"
+```
+
+The following is the function for blinking the LED.
 ```
 void led_task(__unused void *params) {
     while(true) {
@@ -57,6 +65,12 @@ void led_task(__unused void *params) {
     }
     cyw43_arch_deinit();
 }
+```
+
+Include the following in the `vLaunch` function.
+```
+    TaskHandle_t ledtask;
+    xTaskCreate(led_task, "TestLedThread", configMINIMAL_STACK_SIZE, NULL, 5, &ledtask);
 ```
 
 **Create a Temperature Sensor Task**
