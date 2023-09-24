@@ -22,6 +22,8 @@ In this lab, we'll focus on implementing FreeRTOS on Raspberry Pi Pico and explo
 
 ## **SETTING UP FREERTOS ON RPi PICO** 
 
+When integrating FreeRTOS with a project, such as in the case of developing applications for the Raspberry Pi Pico, it is essential to configure the build system correctly, to compile the application code together with the FreeRTOS kernel code. CMake is a widely used build system that can be configured to build your project and the FreeRTOS kernel together. This involves including the FreeRTOS source files and setting the necessary environment settings.
+
 We will be using the [Ping example that uses FreeRTOS](https://github.com/raspberrypi/pico-examples/blob/master/pico_w/wifi/freertos/ping/picow_freertos_ping.c). However, we will need to take a few steps to enable it. Currently, you should **only be able to see** it in Explorer and **not be able to see** it in CMake. To set up FreeRTOS on Raspberry Pi Pico, download the [FreeRTOS Kernel](https://github.com/FreeRTOS/FreeRTOS-Kernel) and unzip it onto your computer. Do take note of where the folder is located.
 
 > [NOTE]
