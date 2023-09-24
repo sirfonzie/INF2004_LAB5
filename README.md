@@ -41,7 +41,7 @@ There are various methods to do it, but in this example, we will include the pat
 Next, include `pico_enable_stdio_usb(picow_freertos_ping_sys 1)` into the CMakeLists.txt file for "picow_freertos_ping_sys" to allow serial monitoring via USB.
 Do remember to re-select the "Pico ARM GCC" compiler to kick-start the configuration process.
 
-<img src="/img/NoSMP.png" width=100% height=100%>
+<img src="/img/NoSMP.PNG" width=100% height=100%>
 
 Finally, before you can start compiling your code, make the following changes (lines #107 & #110) to the FreeRTOS configuration. The configuration file is located at "pico_w\wifi\freertos\ping\FreeRTOSConfig.h". 
 
