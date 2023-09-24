@@ -25,7 +25,7 @@ In this lab, we'll focus on implementing FreeRTOS on Raspberry Pi Pico and explo
 We will be using the [Ping example that uses FreeRTOS](https://github.com/raspberrypi/pico-examples/blob/master/pico_w/wifi/freertos/ping/picow_freertos_ping.c). However, we will need to take a few steps to enable it. Currently, you should **only be able to see** it in Explorer and **not be able to see** it in CMake. To set up FreeRTOS on Raspberry Pi Pico, download the [FreeRTOS Kernel](https://github.com/FreeRTOS/FreeRTOS-Kernel) and unzip it onto your computer. Do take note of where the folder is located.
 
 > [NOTE]
-> Please note that there seems to be an issue with this example in version Pico-v1.5.0. Therefore, we will be using using Pico-v1.5.1. Windows user can just reinstall the SDK and it will create a new folder or you may go a git pull.
+> Please note that there seems to be an issue with this example in version Pico-v1.5.0. Therefore, we will be using using Pico-v1.5.1. Windows users can just reinstall the SDK and it will create a new folder or you may go a git pull.
 
 <img src="/img/freertosfolder.png" width=100% height=100%>
 
@@ -38,11 +38,23 @@ There are various methods to do it, but in this example, we will include the pat
 <img src="/img/CMakeTools.png" width=100% height=100%>
 <img src="/img/CmakeEnvironment.png" width=100% height=100%>
 
-Finally, before you can start compiling your code, include `pico_enable_stdio_usb(picow_freertos_ping_sys 1)` into the CMakeLists.txt file for "picow_freertos_ping_sys"
+Next, include `pico_enable_stdio_usb(picow_freertos_ping_sys 1)` into the CMakeLists.txt file for "picow_freertos_ping_sys" to allow serial monitoring via USB.
 Do remember to re-select the "Pico ARM GCC" compiler to kick-start the configuration process.
+
+Finally, before you can start compiling your code, make the following changes (lines #107 & #110) to the FreeRTOS configuration. The configuration file is located at "pico_w\wifi\freertos\ping\FreeRTOSConfig.h". 
+```
+#if FREE_RTOS_KERNEL_SMP // set by the RP2040 SMP port of FreeRTOS
+/* SMP port only */
+#define configNUM_CORES                         1
+#define configTICK_CORE                         0
+#define configRUN_MULTIPLE_PRIORITIES           1
+#define configUSE_CORE_AFFINITY                 0
+#endif
+```
 
 At this point, if everything is done correctly, you should be able to see the project under CMake.
 <img src="/img/CMakePing.png" width=100% height=100%>
+
 
 You should try building the project and downloading the code to the RPi Pico. You should be able to see some output on the Serial Monitor.
 
