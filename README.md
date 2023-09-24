@@ -22,27 +22,24 @@ In this lab, we'll focus on implementing FreeRTOS on Raspberry Pi Pico and explo
 
 ## **SETTING UP FREERTOS ON RPi PICO** 
 
-To set up FreeRTOS on Raspberry Pi Pico, follow the instructions below:
+We will be using the [Ping example that uses FreeRTOS](https://github.com/raspberrypi/pico-examples/blob/master/pico_w/wifi/freertos/ping/picow_freertos_ping.c). However, we will need to take a few steps to enable it. Currently, you should **only be able to see** it in Explorer and **not be able to see** it in CMake. To set up FreeRTOS on Raspberry Pi Pico, download the [FreeRTOS Kernel](https://github.com/FreeRTOS/FreeRTOS-Kernel) and unzip it onto your computer. Do take note of where the folder is located.
 
+<img src="/img/freertosfolder.png" width=100% height=100%>
 
-
-
-[FreeRTOS Kernel](https://github.com/FreeRTOS/FreeRTOS-Kernel)
-
-[Ping example that uses FreeRTOS](https://github.com/raspberrypi/pico-examples/blob/master/pico_w/wifi/freertos/ping/picow_freertos_ping.c)
-
-Add three Items into the Cmake: Environment
+Then add three items into the Cmake: Environment
 - FREERTOS_KERNEL_PATH: C:\FreeRTOS-Kernel-main
 - WIFI_SSID: INF2004
 - WIFI_PASSWORD: superduperpassword
 
+There are various methods to do it, but in this example, we will include the path into the CMake environment, not the Windows environment. The images below guide you on how you can include the three items.
 <img src="/img/CMakeTools.png" width=100% height=100%>
-
 <img src="/img/CmakeEnvironment.png" width=100% height=100%>
 
-Include `pico_enable_stdio_usb(picow_freertos_ping_sys 1)` into the CMakeLists.txt file for "picow_freertos_ping_sys"
+Finally, before you can start compiling your code, include `pico_enable_stdio_usb(picow_freertos_ping_sys 1)` into the CMakeLists.txt file for "picow_freertos_ping_sys"
+Do remember to re-select the "Pico ARM GCC" compiler to kick-start the configuration process.
 
-Reselect the "Pico ARM GCC" compiler to kick-start the configuration process.
+At this point, if everything is done correctly, you should be able to see the project under CMake.
+<img src="/img/CMakePing.png" width=100% height=100%>
 
 ## **Create FreeRTOS Tasks**
 
