@@ -66,10 +66,14 @@ At this point, if everything is done correctly, you should be able to see the pr
 
 You should try building the project and downloading the code to the RPi Pico. You should be able to see some output on the Serial Monitor.
 
+<img src="/img/task1.png" width=100% height=100%>
+
 ## **Create FreeRTOS Tasks**
 Currently, we are operating a single task that directs its focus on pinging a specified IP address. Nonetheless, given that we are utilizing a Real-Time Operating System (RTOS), our system is inherently designed to execute multiple tasks concurrently. Consequently, our subsequent task will logically involve constructing an additional task—a task designated to manage the blinking of an LED.
 
 **Create a Blinking LED Task**
+
+<img src="/img/task2.png" width=100% height=100%>
 
 Include the following header files to allow printf and to use the GPIO for the LED.
 ```
@@ -101,6 +105,7 @@ Build and download the project to the RPi Pico. You should now see the ping mess
 
 The RP2040 microcontroller, embedded in the Raspberry Pi Pico, comes with an inbuilt temperature sensor, allowing developers to easily access and measure the ambient temperature. This sensor is part of the RP2040’s ADC (Analog to Digital Converter) system, which means it converts the analog temperature value to a digital representation that can be processed and read by the MCU. In this section, we’ll discuss how to access this built-in temperature sensor to retrieve temperature data. To access the temperature sensor data, we use the ADC to read the analog voltage and then convert this analog value to a temperature reading in degrees Celsius. Here is a simple step-by-step guide to achieving this.
 
+<img src="/img/task3.png" width=100% height=100%>
 
 Include the following header. This is to digitize the data from the inbuilt temperature sensor within RP2040.
 ```
@@ -147,6 +152,8 @@ Build and download the project to the RPi Pico. You should continue seeing the p
 Filtering sensor data is crucial in embedded systems and other applications where sensors are employed. Sensors, regardless of their type, are prone to noise and interference from external sources, such as electromagnetic fields. This noise can distort the sensor's readings, making the raw data unreliable. Filtering helps mitigate the impact of noise, providing more accurate and reliable sensor readings. In real-world applications, sensor readings can exhibit fluctuations due to environmental changes or other factors. Filtering helps in smoothing the data by averaging the values over time, which aids in identifying trends and patterns more clearly and avoiding reactionary responses to sudden, brief changes in readings. Some filtering methods help in reducing the amount of data that needs to be processed, stored, or transmitted, which is crucial in resource-constrained environments. By removing unnecessary data points or outliers, filtering can help in optimizing the use of system resources, such as memory and processing power.
 
 In the context of our application, we utilize a message buffer to receive temperature data from the `temp_task`. Message buffers are particularly effective for passing data between tasks, ensuring data integrity and synchronization between different parts of the system. In this case, the `temp_task` sends the temperature readings to the `avg_task` via the message buffer. Upon receiving the temperature data in `avg_task`, a Simple Moving Window Averaging Algorithm is implemented to filter the incoming data. This algorithm works by maintaining a 'window' of the most recent readings and computing the average, thereby providing a smoother and more consistent data output. This smoothed data, derived from the averaging algorithm, is essential for rendering a more accurate representation of the temperature trends, filtering out transient fluctuations and potential noise in the sensor readings, thereby contributing to the enhanced reliability and accuracy of the system’s response to the environmental conditions.
+
+<img src="/img/task4.png" width=100% height=100%>
 
 We start by creating the following handler to manage the message buffer.
 ```
