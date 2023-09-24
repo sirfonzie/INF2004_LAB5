@@ -25,7 +25,7 @@ In this lab, we'll focus on implementing FreeRTOS on Raspberry Pi Pico and explo
 We will be using the [Ping example that uses FreeRTOS](https://github.com/raspberrypi/pico-examples/blob/master/pico_w/wifi/freertos/ping/picow_freertos_ping.c). However, we will need to take a few steps to enable it. Currently, you should **only be able to see** it in Explorer and **not be able to see** it in CMake. To set up FreeRTOS on Raspberry Pi Pico, download the [FreeRTOS Kernel](https://github.com/FreeRTOS/FreeRTOS-Kernel) and unzip it onto your computer. Do take note of where the folder is located.
 
 > [NOTE]
-> Please note that there seems to be an issue with this example in version Pico-v1.5.0. Therefore, we will be using using Pico-v1.5.1
+> Please note that there seems to be an issue with this example in version Pico-v1.5.0. Therefore, we will be using using Pico-v1.5.1. Windows user can just reinstall the SDK and it will create a new folder or you may go a git pull.
 
 <img src="/img/freertosfolder.png" width=100% height=100%>
 
