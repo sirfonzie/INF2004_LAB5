@@ -62,6 +62,7 @@ At this point, if everything is done correctly, you should be able to see the pr
 You should try building the project and downloading the code to the RPi Pico. You should be able to see some output on the Serial Monitor.
 
 ## **Create FreeRTOS Tasks**
+Currently, we are operating a single task that directs its focus on pinging a specified IP address. Nonetheless, given that we are utilizing a Real-Time Operating System (RTOS), our system is inherently designed to execute multiple tasks concurrently. Consequently, our subsequent task will logically involve constructing an additional task—a task designated to manage the blinking of an LED.
 
 **Create a Blinking LED Task**
 
@@ -71,7 +72,7 @@ Include the following header files to allow printf and to use the GPIO for the L
 #include "hardware/gpio.h"
 ```
 
-The following is the function for blinking the LED.
+The following is the function for blinking the LED. Notice that each task is a forever loop. In this example, the LED will turn on for 2 seconds and turn off for 2 seconds.
 ```
 void led_task(__unused void *params) {
     while(true) {
@@ -80,11 +81,10 @@ void led_task(__unused void *params) {
         vTaskDelay(2000);
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
     }
-    cyw43_arch_deinit();
 }
 ```
 
-Include the following in the `vLaunch` function.
+Include the following in the `vLaunch` function. This will create the instance of the task for execution. TaskHandle is used for managing the task, i.e. deleting, changing priority, etc.
 ```
     TaskHandle_t ledtask;
     xTaskCreate(led_task, "TestLedThread", configMINIMAL_STACK_SIZE, NULL, 5, &ledtask);
@@ -92,12 +92,15 @@ Include the following in the `vLaunch` function.
 
 **Create a Temperature Sensor Task**
 
+The RP2040 microcontroller, embedded in the Raspberry Pi Pico, comes with an inbuilt temperature sensor, allowing developers to easily access and measure the ambient temperature. This sensor is part of the RP2040’s ADC (Analog to Digital Converter) system, which means it converts the analog temperature value to a digital representation that can be processed and read by the MCU. In this section, we’ll discuss how to access this built-in temperature sensor to retrieve temperature data. To access the temperature sensor data, we use the ADC to read the analog voltage and then convert this analog value to a temperature reading in degrees Celsius. Here is a simple step-by-step guide to achieving this.
+
+
 Include the following header. This is to digitize the data from the inbuilt temperature sensor within RP2040.
 ```
 #include "hardware/adc.h"
 ```
 
-The following is the functions to obtain the temperature from the RP2040 and print it out via the serial.
+The following are the functions to obtain the temperature from the RP2040 and print it out via the serial. In the `temp_task` function, we initialize the ADC before reading the sensor data, it is essential to initialize the ADC subsystem. This prepares the ADC to start taking readings. The ADC system can read from multiple channels, so we need to select the temperature sensor as the input channel to the ADC (the temperature sensor is on input 4). Once the temperature sensor is selected, we can read the analog value from the ADC. The adc_read() function returns a 12-bit value representing the analog voltage reading from the temperature sensor. The obtained analog value needs to be converted to a temperature reading. You can use the conversion formula provided in the RP2040 datasheet or SDK to convert the ADC reading to a temperature value in degrees Celsius as shown in `read_onboard_temperature()`.
 ```
 float read_onboard_temperature() {
     
@@ -114,7 +117,7 @@ void temp_task(__unused void *params) {
     float temperature = 0.0;
     adc_init();
     adc_set_temp_sensor_enabled(true);
-    adc_select_input(4);
+    adc_select_input(4);                 // Temperature sensor is on input 4
 
     while(true) {
         vTaskDelay(1000);
