@@ -75,9 +75,9 @@ The following is the function for blinking the LED.
 ```
 void led_task(__unused void *params) {
     while(true) {
-        vTaskDelay(5000);
+        vTaskDelay(2000);
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
-        vTaskDelay(1000);
+        vTaskDelay(2000);
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
     }
     cyw43_arch_deinit();
@@ -92,13 +92,77 @@ Include the following in the `vLaunch` function.
 
 **Create a Temperature Sensor Task**
 
+Include the following header. This is to digitize the data from the inbuilt temperature sensor within RP2040.
+```
+#include "hardware/adc.h"
+```
+
+The following is the functions to obtain the temperature from the RP2040 and print it out via the serial.
+```
+float read_onboard_temperature() {
+    
+    /* 12-bit conversion, assume max value == ADC_VREF == 3.3 V */
+    const float conversionFactor = 3.3f / (1 << 12);
+
+    float adc = (float)adc_read() * conversionFactor;
+    float tempC = 27.0f - (adc - 0.706f) / 0.001721f;
+
+    return tempC;
+}
+
+void temp_task(__unused void *params) {
+    float temperature = 0.0;
+    adc_init();
+    adc_set_temp_sensor_enabled(true);
+    adc_select_input(4);
+
+    while(true) {
+        vTaskDelay(1000);
+        temperature = read_onboard_temperature();
+        printf("Onboard temperature = %.02f C\n", temperature);
+    }
+}
+```
+
+Include the following in the `vLaunch` function.
+```
+    TaskHandle_t temptask;
+    xTaskCreate(temp_task, "TestTempThread", configMINIMAL_STACK_SIZE, NULL, 8, &temptask);
+```
+
 
 
 
 **Create an Average Filtering Task**
 
+Create the following variable to manage the message buffer. This is to send data from the temp_task to the avg_task.
+```
+static MessageBufferHandle_t xControlMessageBuffer;
+```
 
+Modify the temp_task to send a message each time it obtains new temperature data from the sensor.
+```
+void temp_task(__unused void *params) {
+    float temperature = 0.0;
+    adc_init();
+    adc_set_temp_sensor_enabled(true);
+    adc_select_input(4);
 
+    while(true) {
+        vTaskDelay(1000);
+        temperature = read_onboard_temperature();
+        printf("Onboard temperature = %.02f C\n", temperature);
+        xMessageBufferSend( /* The message buffer to write to. */
+            xControlMessageBuffer,
+            /* The source of the data to send. */
+            (void *) &temperature,
+            /* The length of the data to send. */
+            sizeof( temperature ),
+            /* The block time; 0 = no block */
+            0 );
+    }
+}
+```
 
 ## **EXERCISE**
 
