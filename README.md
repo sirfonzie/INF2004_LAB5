@@ -2,7 +2,7 @@
 
 **OBJECTIVES**
 - Configure and implement FreeRTOS on RPi Pico.
-- Utilize FreeRTOS functionalities such as Task Creation, Message Buffers and Semaphores.
+- Utilize FreeRTOS functionalities such as Task Creation and Message Buffers.
 - Implement a filtering algorithm for processing sensor data.
 
 
@@ -16,9 +16,9 @@
 
 ## **INTRODUCTION** 
 
-Real-Time Operating Systems (RTOS), are operating systems designed to meet the requirements of real-time systems, which need to process inputs and provide outputs without buffering delays. FreeRTOS is a popular open-sourced RTOS that offers straightforward functionality to enable easy, robust, and optimizable design in embedded systems like the Raspberry Pi Pico. FreeRTOS offers many functionalities such as Message Buffers to help inter-task communications and data transfer, whereas Semaphores aid in task synchronization and mutual exclusion, ensuring data consistency.
+Real-Time Operating Systems (RTOS), are operating systems designed to meet the requirements of real-time systems, which need to process inputs and provide outputs without buffering delays. FreeRTOS is a popular open-sourced RTOS that offers straightforward functionality to enable easy, robust, and optimizable design in embedded systems like the Raspberry Pi Pico. FreeRTOS offers many functionalities such as Task Management to manage the tasks and Message Buffers to help inter-task communications and data transfer.
 
-In this lab, we'll focus on implementing FreeRTOS on Raspberry Pi Pico and explore its features by writing tasks that use Message Buffers and Semaphores. We’ll also cover how to process sensor data using a filtering algorithm.
+In this lab, we'll focus on implementing FreeRTOS on Raspberry Pi Pico and explore its features by writing tasks that use Message Buffers. We’ll also cover how to process sensor data using a simple filtering algorithm.
 
 ## **SETTING UP FREERTOS ON RPi PICO** 
 
@@ -144,7 +144,11 @@ Build and download the project to the RPi Pico. You should continue seeing the p
 
 **Create an Average Filtering Task**
 
-Create the following variable to manage the message buffer. This is to send data from the temp_task to the avg_task.
+Filtering sensor data is crucial in embedded systems and other applications where sensors are employed. Sensors, regardless of their type, are prone to noise and interference from external sources, such as electromagnetic fields. This noise can distort the sensor's readings, making the raw data unreliable. Filtering helps mitigate the impact of noise, providing more accurate and reliable sensor readings. In real-world applications, sensor readings can exhibit fluctuations due to environmental changes or other factors. Filtering helps in smoothing the data by averaging the values over time, which aids in identifying trends and patterns more clearly and avoiding reactionary responses to sudden, brief changes in readings. Some filtering methods help in reducing the amount of data that needs to be processed, stored, or transmitted, which is crucial in resource-constrained environments. By removing unnecessary data points or outliers, filtering can help in optimizing the use of system resources, such as memory and processing power.
+
+In the context of our application, we utilize a message buffer to receive temperature data from the `temp_task`. Message buffers are particularly effective for passing data between tasks, ensuring data integrity and synchronization between different parts of the system. In this case, the `temp_task` sends the temperature readings to the `avg_task` via the message buffer. Upon receiving the temperature data in `avg_task`, a Simple Moving Window Averaging Algorithm is implemented to filter the incoming data. This algorithm works by maintaining a 'window' of the most recent readings and computing the average, thereby providing a smoother and more consistent data output. This smoothed data, derived from the averaging algorithm, is essential for rendering a more accurate representation of the temperature trends, filtering out transient fluctuations and potential noise in the sensor readings, thereby contributing to the enhanced reliability and accuracy of the system’s response to the environmental conditions.
+
+We start by creating the following handler to manage the message buffer.
 ```
 static MessageBufferHandle_t xControlMessageBuffer;
 ```
