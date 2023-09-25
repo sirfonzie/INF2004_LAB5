@@ -222,6 +222,8 @@ Include the following in the `vLaunch` function. This will create the instance o
 
 Build and download the project to the RPi Pico. You should continue seeing the ping message appearing on the serial monitor and the LED blinking. However, this time, you should also see an additional message appearing on the serial monitor which is the current temperature data **AND** the averaged data.
 
+I have attached the [modified version of the ping code](https://github.com/sirfonzie/INF2004_LAB5/blob/main/picow_freertos_ping.c) that includes all 4 tasks for those who are struggling and could not get it to compile successfully.
+
 ## **EXERCISE**
 
 Develop an application using FreeRTOS that contains a task that reads the temperature data from the RP2040's built-in temperature sensor and sends it to two tasks. The **second task** will perform a moving average on a buffer of ten data points, and the **third task** will perform a simple averaging. Additionally, create a **fourth task** exclusively for executing all the `printf` statements. No `printf` statements are allowed in any other task.
