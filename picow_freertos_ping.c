@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <stdio.h>
+
 #include "pico/cyw43_arch.h"
 #include "pico/stdlib.h"
 
@@ -14,9 +16,7 @@
 #include "ping.h"
 #include "message_buffer.h"
 
-#include <stdio.h>
 #include "hardware/gpio.h"
-
 #include "hardware/adc.h"
 
 #define mbaTASK_MESSAGE_BUFFER_SIZE       ( 60 )
@@ -69,6 +69,7 @@ void main_task(__unused void *params) {
     cyw43_arch_deinit();
 }
 
+/* A Task that blinks the LED for 3 seconds continuously */
 void led_task(__unused void *params) {
     while(true) {
         vTaskDelay(3000);
@@ -78,60 +79,49 @@ void led_task(__unused void *params) {
     }
 }
 
+/* A Task that obtains the data every second from the inbuilt temperature sensor (RP2040), prints it out and sends it to avg_task via message buffer */
 void temp_task(__unused void *params) {
     float temperature = 0.0;
-    char cString[ 15 ];
+
     adc_init();
     adc_set_temp_sensor_enabled(true);
     adc_select_input(4);
+
     while(true) {
         vTaskDelay(1000);
         temperature = read_onboard_temperature();
         printf("Onboard temperature = %.02f C\n", temperature);
-        //sprintf(cString, "%0.2f",temperature);
-        xMessageBufferSend( /* The message buffer to write to. */
-            xControlMessageBuffer,
-            /* The source of the data to send. */
-            (void *) &temperature,
-            /* The length of the data to send. */
-            sizeof( temperature ),
-            /* The block time, should the buffer be full. */
-            0 );
+        xMessageBufferSend( 
+            xControlMessageBuffer,    /* The message buffer to write to. */
+            (void *) &temperature,    /* The source of the data to send. */
+            sizeof( temperature ),    /* The length of the data to send. */
+            0 );                      /* Do not block, should the buffer be full. */
     }
 }
 
+/* A Task that indefinitely waits for data from temp_task via message buffer. Once received, it will calculate the moving average and prints out the result. */
 void avg_task(__unused void *params) {
     float fReceivedData;
+    float sum = 0;
     size_t xReceivedBytes;
+    
     static float data[4] = {0};
     static int index = 0;
     static int count = 0;
-    float sum = 0;
 
     while(true) {
-        xReceivedBytes = xMessageBufferReceive( /* The message buffer to receive from. */
-            xControlMessageBuffer,
-            /* Location to store received data. */
-            (void *) &fReceivedData,
-            /* Maximum number of bytes to receive. */
-            sizeof( fReceivedData ),
-            /* Ticks to wait if buffer is empty. */
-            portMAX_DELAY );
+        xReceivedBytes = xMessageBufferReceive( 
+            xControlMessageBuffer,        /* The message buffer to receive from. */
+            (void *) &fReceivedData,      /* Location to store received data. */
+            sizeof( fReceivedData ),      /* Maximum number of bytes to receive. */
+            portMAX_DELAY );              /* Wait indefinitely */
 
-            // Subtract the oldest element from sum
-            sum -= data[index];
+            sum -= data[index];            // Subtract the oldest element from sum
+            data[index] = fReceivedData;   // Assign the new element to the data
+            sum += data[index];            // Add the new element to sum
+            index = (index + 1) % 4;       // Update the index - make it circular
             
-            // Assign the new element to the buffer
-            data[index] = fReceivedData;
-            
-            // Add the new element to sum
-            sum += data[index];
-            
-            // Update the index
-            index = (index + 1) % 4; // make it circular
-            
-            // Increment count till it reaches FILTER_SIZE
-            if (count < 4) count++;
+            if (count < 4) count++;        // Increment count till it reaches 4
 
             printf("Average Temperature = %0.2f C\n", sum / count);
     }
