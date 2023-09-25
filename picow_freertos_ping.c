@@ -69,7 +69,7 @@ void main_task(__unused void *params) {
     cyw43_arch_deinit();
 }
 
-/* A Task that blinks the LED for 3 seconds continuously */
+/* A Task that blinks the LED for 3000 ticks continuously */
 void led_task(__unused void *params) {
     while(true) {
         vTaskDelay(3000);
@@ -79,7 +79,7 @@ void led_task(__unused void *params) {
     }
 }
 
-/* A Task that obtains the data every second from the inbuilt temperature sensor (RP2040), prints it out and sends it to avg_task via message buffer */
+/* A Task that obtains the data every 1000 ticks from the inbuilt temperature sensor (RP2040), prints it out and sends it to avg_task via message buffer */
 void temp_task(__unused void *params) {
     float temperature = 0.0;
 
