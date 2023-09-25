@@ -81,7 +81,7 @@ Include the following header files to allow printf and to use the GPIO for the L
 #include "hardware/gpio.h"
 ```
 
-The following is the function for blinking the LED. Notice that each task is a forever loop. In this example, the LED will turn on for 2 seconds and turn off for 2 seconds.
+The following is the function for blinking the LED. Notice that each task is a forever loop. In this example, the LED will turn on for 2000 ticks (approx 2 seconds) and turn off for 2000 ticks.
 ```
 void led_task(__unused void *params) {
     while(true) {
@@ -155,9 +155,15 @@ In the context of our application, we utilize a message buffer to receive temper
 
 <img src="/img/task4.png" width=100% height=100%>
 
-We start by creating the following handler to manage the message buffer.
+We start by creating the following handler and #define label to manage the message buffer.
 ```
+#define mbaTASK_MESSAGE_BUFFER_SIZE       ( 60 )
 static MessageBufferHandle_t xControlMessageBuffer;
+```
+
+You will also need to include the following in the `vLaunch` function, preferably after all the xTaskCreate. This is to create the message buffer to that can be used by the various tasks. Note that message buffer have a 1-to-1 relationship, thus if you need one task to send to multiple tasks, you will need to create multiple message buffers or use other FreeRTOS services, i.e. queues, etc.
+```
+xControlMessageBuffer = xMessageBufferCreate(mbaTASK_MESSAGE_BUFFER_SIZE);
 ```
 
 Modify the temp_task to send a message each time it obtains new temperature data from the sensor. In the `temp_task` function, a message buffer, `xControlMessageBuffer`, is used as a mechanism for inter-task communication to send temperature data between tasks. The task initializes and configures the ADC to read the onboard temperature sensor and then enters into an infinite loop. In each iteration of the loop, after a delay, the task reads the onboard temperature and prints it. Subsequently, the temperature data is sent to the message buffer using `xMessageBufferSend()`. This function takes the message buffer to write to, a pointer to the source of the data to send, the length of the data to send, and the block time as parameters. In this case, the source of the data is the address of the `temperature` variable, the length of the data is the size of a `float`, and the block time is set to `0`, meaning the task does not block if the message buffer is full. The data sent to the message buffer can be received by another task using the `xMessageBufferReceive()` function, allowing seamless sharing of data between different tasks in the FreeRTOS environment.
