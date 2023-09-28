@@ -36,6 +36,10 @@ Then add three items into the Cmake: Environment
 - WIFI_SSID: INF2004
 - WIFI_PASSWORD: superduperpassword
 
+> [NOTE]
+> Please use your own hotspot for the WIFI_SSID and WIFI_PASSWORD.
+
+
 There are various methods to do it, but in this example, we will include the path into the CMake environment, not the Windows environment. The images below guide you on how you can include the three items.
 <img src="/img/CMakeTools.png" width=100% height=100%>
 <img src="/img/CmakeEnvironment.png" width=100% height=100%>
@@ -111,6 +115,19 @@ Include the following header. This is to digitize the data from the inbuilt temp
 ```
 #include "hardware/adc.h"
 ```
+
+In addition, you will need to add in `hardware_adc` in CMakeLists.txt under as shown below:
+
+```
+    target_link_libraries(picow_freertos_ping_sys
+            hardware_adc
+            pico_cyw43_arch_lwip_sys_freertos
+            pico_stdlib
+            pico_lwip_iperf
+            FreeRTOS-Kernel-Heap4 # FreeRTOS kernel and dynamic heap
+            )
+```
+
 
 The following are the functions to obtain the temperature from the RP2040 and print it out via the serial. In the `temp_task` function, we initialize the ADC before reading the sensor data, it is essential to initialize the ADC subsystem. This prepares the ADC to start taking readings. The ADC system can read from multiple channels, so we need to select the temperature sensor as the input channel to the ADC (the temperature sensor is on input 4). Once the temperature sensor is selected, we can read the analog value from the ADC. The adc_read() function returns a 12-bit value representing the analog voltage reading from the temperature sensor. The obtained analog value needs to be converted to a temperature reading. You can use the conversion formula provided in the RP2040 datasheet or SDK to convert the ADC reading to a temperature value in degrees Celsius as shown in `read_onboard_temperature()`.
 ```
