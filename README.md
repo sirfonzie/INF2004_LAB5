@@ -249,4 +249,4 @@ I have attached the [modified version of the ping code](https://github.com/sirfo
 
 ## **EXERCISE**
 
-Develop an application using FreeRTOS that contains a task that reads the temperature data from the RP2040's built-in temperature sensor and sends it to two tasks. The **second task** will perform a moving average on a buffer of ten data points, and the **third task** will perform a simple averaging. Additionally, create a **fourth task** exclusively for executing all the `printf` statements. No `printf` statements are allowed in any other task.
+Develop an application using FreeRTOS that contains a task that reads the temperature data from the RP2040's built-in temperature sensor and sends it to two tasks every 1 second. The **second task** will perform a moving average on a buffer of ten data points, and the **third task** will perform a simple averaging. Additionally, create a **fourth task** exclusively for executing all the `printf` statements. No `printf` statements are allowed in any other task.
