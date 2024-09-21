@@ -33,11 +33,10 @@ We will be using the [Ping example that uses FreeRTOS](https://github.com/raspbe
 
 Then add three items into the Cmake: Environment
 - FREERTOS_KERNEL_PATH: C:\FreeRTOS-Kernel-main
-- WIFI_SSID: INF2004
-- WIFI_PASSWORD: superduperpassword
+- WIFI_SSID: <your mobile hotspot SSID> (SIT's WiFi would not work)
+- WIFI_PASSWORD: <superduperpassword>
 
-> [NOTE]
-> Please use your own hotspot for the WIFI_SSID and WIFI_PASSWORD.
+> [NOTE]: Please use your own hotspot for the WIFI_SSID and WIFI_PASSWORD, as SIT's WiFi security doesn't work well with Pico.
 
 
 There are various methods to do it, but in this example, we will include the path into the CMake environment, not the Windows environment. The images below guide you on how you can include the three items.
