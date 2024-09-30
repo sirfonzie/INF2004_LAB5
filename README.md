@@ -171,13 +171,18 @@ In the context of our application, we utilize a message buffer to receive temper
 
 <img src="/img/task4.png" width=100% height=100%>
 
-We start by creating the following handler and #define label to manage the message buffer.
+We start by including the header file (.h) to inform the compiler that we intend to use messagebuffer library in this build.
+```
+#include "message_buffer.h"
+```
+
+This is followed by including the handler and #define label to manage the message buffer.
 ```
 #define mbaTASK_MESSAGE_BUFFER_SIZE       ( 60 )
 static MessageBufferHandle_t xControlMessageBuffer;
 ```
 
-You will also need to include the following in the `vLaunch` function, preferably after all the xTaskCreate. This is to create the message buffer to that can be used by the various tasks. Note that message buffer have a 1-to-1 relationship, thus if you need one task to send to multiple tasks, you will need to create multiple message buffers or use other FreeRTOS services, i.e. queues, etc.
+You will also need to include the following in the `vLaunch` function, preferably after all the xTaskCreate. This is to create the message buffer that can be used by the various tasks. Note that message buffers have an N-to-1 relationship; thus, if you need one sender task to send to multiple receiver tasks, you will need to create multiple message buffers or use other FreeRTOS services, i.e. queues, etc. In this case, `xControlMessageBuffer` is the handle created to reference a single message buffer, which acts like a "mailbox" for sending and receiving tasks. If you need more "mailboxes" for different tasks or communication channels, you can create additional message buffers by declaring and creating similar handles. Each handle would reference its own separate message buffer, allowing you to manage multiple independent communication channels between tasks or interrupts in your FreeRTOS application. For instance, you could have multiple message buffers like `xSensorMessageBuffer`, `xDataMessageBuffer`, and so on, each serving a specific purpose within the system.
 ```
 xControlMessageBuffer = xMessageBufferCreate(mbaTASK_MESSAGE_BUFFER_SIZE);
 ```
